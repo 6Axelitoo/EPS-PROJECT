@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boîte à Outils EPS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .app-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .app-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .app-card h2 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.5em;
+        }
+
+        .app-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .app-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: white;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 15px;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 30px;
+            cursor: pointer;
+            color: #666;
+            background: none;
+            border: none;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #5568d3;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .timer-display {
+            font-size: 4em;
+            text-align: center;
+            margin: 30px 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .team-box {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .student-item {
+            background: white;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .exercise-card {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+        }
+
+        .input-group {
+            margin: 15px 0;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .stat-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .stat-box h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .counter-display {
+            font-size: 3em;
+            font-weight: bold;
+            color: #333;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏃‍♂️ Boîte à Outils EPS</h1>
+            <p>Toutes vos applications pour simplifier vos cours d'EPS</p>
+        </header>
+
+        <div class="apps-grid">
+            <div class="app-card" onclick="openApp('timer')">
+                <div class="app-icon">⏱️</div>
+                <h2>Chronomètre</h2>
+                <p>Timer et chronomètre pour vos exercices chronométrés</p>
+            </div>
+
+            <div class="app-card" onclick="openApp('teams')">
+                <div class="app-icon">👥</div>
+                <h2>Générateur d'équipes</h2>
+                <p>Créez des équipes aléatoires et équilibrées</p>
+            </div>
+
+            <div class="app-card" onclick="openApp('tracking')">
+                <div class="app-icon">📊</div>
+                <h2>Suivi de performances</h2>
+                <p>Enregistrez et suivez les résultats de vos élèves</p>
+            </div>
+
+            <div class="app-card" onclick="openApp('planner')">
+                <div class="app-icon">🎯</div>
+                <h2>Planificateur</h2>
+                <p>Organisez vos séances et exercices</p>
+            </div>
+
+            <div class="app-card" onclick="openApp('evaluation')">
+                <div class="app-icon">📝</div>
+                <h2>Grille d'évaluation</h2>
+                <p>Évaluez rapidement vos élèves</p>
+            </div>
+        </div>
+
+        <header style="margin-top: 60px;">
+            <h2>🏆 APSA - Activités Physiques Sportives</h2>
+        </header>
+
+        <div class="apps-grid">
+            <div class="app-card" onclick="openApp('basket')">
+                <div class="app-icon">🏀</div>
+                <h2>Basket</h2>
+                <p>Observation et analyse de match de basket</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Chronomètre -->
+    <div id="timer-modal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeApp('timer')">&times;</button>
+            <h2>⏱️ Chronomètre / Timer</h2>
+            <div class="timer-display" id="timer-display">00:00:00</div>
+            <div style="text-align: center;">
+                <button class="btn" onclick="startTimer()">Démarrer</button>
+                <button class="btn btn-danger" onclick="stopTimer()">Stop</button>
+                <button class="btn" onclick="resetTimer()">Réinitialiser</button>
+            </div>
+            <div class="input-group">
+                <label>Timer prédéfini (minutes):</label>
+                <input type="number" id="preset-time" placeholder="Ex: 5" min="1">
+                <button class="btn" onclick="setPresetTimer()">Définir timer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Équipes -->
+    <div id="teams-modal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeApp('teams')">&times;</button>
+            <h2>👥 Générateur d'équipes</h2>
+            <div class="input-group">
+                <label>Noms des élèves (un par ligne):</label>
+                <textarea id="students-input" rows="8" placeholder="Jean&#10;Marie&#10;Pierre&#10;Sophie..."></textarea>
+            </div>
+            <div class="input-group">
+                <label>Nombre d'équipes:</label>
+                <input type="number" id="team-count" min="2" value="2">
+            </div>
+            <button class="btn" onclick="generateTeams()">Générer les équipes</button>
+            <div id="teams-result"></div>
+        </div>
+    </div>
+
+    <!-- Modal Suivi -->
+    <div id="tracking-modal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeApp('tracking')">&times;</button>
+            <h2>📊 Suivi de performances</h2>
+            <div class="input-group">
+                <label>Nom de l'élève:</label>
+                <input type="text" id="student-name">
+            </div>
+            <div class="input-group">
+                <label>Activité:</label>
+                <input type="text" id="activity-name" placeholder="Ex: Sprint 100m">
+            </div>
+            <div class="input-group">
+                <label>Résultat:</label>
+                <input type="text" id="result-value" placeholder="Ex: 12.5 secondes">
+            </div>
+            <button class="btn" onclick="addPerformance()">Ajouter</button>
+            <div id="performance-list"></div>
+        </div>
+    </div>
+
+    <!-- Modal Planificateur -->
+    <div id="planner-modal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeApp('planner')">&times;</button>
+            <h2>🎯 Planificateur de séances</h2>
+            <div class="input-group">
+                <label>Titre de la séance:</label>
+                <input type="text" id="session-title">
+            </div>
+            <div class="input-group">
+                <label>Classe:</label>
+                <input type="text" id="session-class" placeholder="Ex: 4ème A">
+            </div>
+            <div class="input-group">
+                <label>Exercices:</label>
+                <textarea id="session-exercises" rows="6" placeholder="Décrivez les exercices de la séance..."></textarea>
+            </div>
+            <button class="btn" onclick="addSession()">Ajouter séance</button>
+            <div id="sessions-list"></div>
+        </div>
+    </div>
+
+    <!-- Modal Évaluation -->
+    <div id="evaluation-modal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeApp('evaluation')">&times;</button>
+            <h2>📝 Grille d'évaluation</h2>
+            <div class="input-group">
+                <label>Nom de l'élève:</label>
+                <input type="text" id="eval-student">
+            </div>
+            <div class="input-group">
+                <label>Compétence évaluée:</label>
+                <input type="text" id="eval-skill" placeholder="Ex: Endurance">
+            </div>
+            <div class="input-group">
+                <label>Note / 20:</label>
+                <input type="number" id="eval-grade" min="0" max="20" step="0.5">
+            </div>
+            <div class="input-group">
+                <label>Commentaire:</label>
+                <textarea id="eval-comment" rows="3"></textarea>
+            </div>
+            <button class="btn" onclick="addEvaluation()">Enregistrer</button>
+            <div id="evaluations-list"></div>
+        </div>
+    </div>
+
+    <!-- Modal Basket -->
+    <div id="basket-modal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeApp('basket')">&times;</button>
+            <div id="basket-page-1">
+                <h2>🏀 Observation Basket - Configuration</h2>
+                <div class="input-group">
+                    <label>Type d'observation:</label>
+                    <select id="basket-obs-type" onchange="toggleBasketFields()">
+                        <option value="equipe">Observer une équipe</option>
+                        <option value="joueur">Observer un joueur</option>
+                    </select>
+                </div>
+                <div class="input-group" id="equipe-fields">
+                    <label>Nom de l'équipe:</label>
+                    <input type="text" id="basket-team-name" placeholder="Ex: Les Bleus">
+                    <label>Couleur de l'équipe:</label>
+                    <input type="text" id="basket-team-color" placeholder="Ex: Bleu">
+                </div>
+                <div class="input-group" id="joueur-fields" style="display: none;">
+                    <label>Nom du joueur:</label>
+                    <input type="text" id="basket-player-name" placeholder="Ex: Pierre Dupont">
+                </div>
+                <div class="input-group">
+                    <label>Date d'observation:</label>
+                    <input type="date" id="basket-date">
+                </div>
+                <div class="input-group">
+                    <label>Nom de l'observateur:</label>
+                    <input type="text" id="basket-observer" placeholder="Votre nom">
+                </div>
+                <button class="btn" onclick="startBasketObservation()">Commencer l'observation</button>
+            </div>
+
+            <div id="basket-page-2" style="display: none;">
+                <button class="btn" onclick="backToBasketConfig()" style="margin-bottom: 20px;">← Retour</button>
+                <h2>🏀 Observation en cours</h2>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <p><strong>Observation:</strong> <span id="display-team"></span></p>
+                    <p><strong>Date:</strong> <span id="display-date"></span></p>
+                    <p><strong>Observateur:</strong> <span id="display-observer"></span></p>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px;">
+                    <div class="stat-box">
+                        <h3>Passes</h3>
+                        <div class="counter-display" id="passes-count">0</div>
+                        <button class="btn" onclick="incrementStat('passes')">+1</button>
+                        <button class="btn btn-danger" onclick="decrementStat('passes')">-1</button>
+                    </div>
+
+                    <div class="stat-box">
+                        <h3>Points marqués</h3>
+                        <div class="counter-display" id="points-count">0</div>
+                        <button class="btn" onclick="addPoints(1)">+1</button>
+                        <button class="btn" onclick="addPoints(2)">+2</button>
+                        <button class="btn" onclick="addPoints(3)">+3</button>
+                        <button class="btn btn-danger" onclick="decrementStat('points')">-1</button>
+                    </div>
+
+                    <div class="stat-box">
+                        <h3>Balles perdues</h3>
+                        <div class="counter-display" id="balles-perdues-count">0</div>
+                        <button class="btn" onclick="incrementStat('ballesPerdues')">+1</button>
+                        <button class="btn btn-danger" onclick="decrementStat('ballesPerdues')">-1</button>
+                    </div>
+
+                    <div class="stat-box">
+                        <h3>Shoots en course</h3>
+                        <div class="counter-display" id="shoots-count">0</div>
+                        <button class="btn" onclick="incrementStat('shoots')">+1</button>
+                        <button class="btn btn-danger" onclick="decrementStat('shoots')">-1</button>
+                    </div>
+                </div>
+
+                <div style="text-align: center;">
+                    <button class="btn" onclick="exportBasketStats()">📊 Exporter les statistiques</button>
+                    <button class="btn btn-danger" onclick="resetBasketStats()">🔄 Réinitialiser</button>
+                </div>
+
+                <div id="basket-summary" style="margin-top: 30px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let timerInterval;
+        let timerSeconds = 0;
+        let performances = [];
+        let sessions = [];
+        let evaluations = [];
+        let basketStats = {
+            passes: 0,
+            points: 0,
+            ballesPerdues: 0,
+            shoots: 0
+        };
+
+        // Gestion des modals
+        function openApp(appName) {
+            document.getElementById(appName + '-modal').style.display = 'block';
+        }
+
+        function closeApp(appName) {
+            document.getElementById(appName + '-modal').style.display = 'none';
+        }
+
+        // Fermer modal en cliquant à l'extérieur
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+
+        // CHRONOMÈTRE
+        function updateTimerDisplay() {
+            const hours = Math.floor(timerSeconds / 3600);
+            const minutes = Math.floor((timerSeconds % 3600) / 60);
+            const seconds = timerSeconds % 60;
+            document.getElementById('timer-display').textContent = 
+                String(hours).padStart(2, '0') + ':' +
+                String(minutes).padStart(2, '0') + ':' +
+                String(seconds).padStart(2, '0');
+        }
+
+        function startTimer() {
+            if (!timerInterval) {
+                timerInterval = setInterval(() => {
+                    timerSeconds++;
+                    updateTimerDisplay();
+                }, 1000);
+            }
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+
+        function resetTimer() {
+            stopTimer();
+            timerSeconds = 0;
+            updateTimerDisplay();
+        }
+
+        function setPresetTimer() {
+            const minutes = parseInt(document.getElementById('preset-time').value);
+            if (minutes > 0) {
+                resetTimer();
+                timerSeconds = minutes * 60;
+                updateTimerDisplay();
+            }
+        }
+
+        // GÉNÉRATEUR D'ÉQUIPES
+        function generateTeams() {
+            const studentsText = document.getElementById('students-input').value.trim();
+            const teamCount = parseInt(document.getElementById('team-count').value);
+            
+            if (!studentsText) {
+                alert('Veuillez entrer des noms d\'élèves');
+                return;
+            }
+
+            const students = studentsText.split('\n').filter(s => s.trim());
+            const shuffled = students.sort(() => Math.random() - 0.5);
+            const teams = Array.from({length: teamCount}, () => []);
+            
+            shuffled.forEach((student, index) => {
+                teams[index % teamCount].push(student);
+            });
+
+            let html = '<h3>Équipes générées:</h3>';
+            teams.forEach((team, index) => {
+                html += `<div class="team-box">
+                    <h4>Équipe ${index + 1}</h4>
+                    <ul>
+                        ${team.map(s => `<li>${s}</li>`).join('')}
+                    </ul>
+                </div>`;
+            });
+            
+            document.getElementById('teams-result').innerHTML = html;
+        }
+
+        // SUIVI DE PERFORMANCES
+        function addPerformance() {
+            const name = document.getElementById('student-name').value.trim();
+            const activity = document.getElementById('activity-name').value.trim();
+            const result = document.getElementById('result-value').value.trim();
+
+            if (!name || !activity || !result) {
+                alert('Veuillez remplir tous les champs');
+                return;
+            }
+
+            performances.push({name, activity, result, date: new Date().toLocaleDateString()});
+            
+            document.getElementById('student-name').value = '';
+            document.getElementById('activity-name').value = '';
+            document.getElementById('result-value').value = '';
+            
+            displayPerformances();
+        }
+
+        function displayPerformances() {
+            let html = '<h3>Performances enregistrées:</h3><table><tr><th>Élève</th><th>Activité</th><th>Résultat</th><th>Date</th></tr>';
+            performances.forEach(p => {
+                html += `<tr><td>${p.name}</td><td>${p.activity}</td><td>${p.result}</td><td>${p.date}</td></tr>`;
+            });
+            html += '</table>';
+            document.getElementById('performance-list').innerHTML = html;
+        }
+
+        // PLANIFICATEUR
+        function addSession() {
+            const title = document.getElementById('session-title').value.trim();
+            const className = document.getElementById('session-class').value.trim();
+            const exercises = document.getElementById('session-exercises').value.trim();
+
+            if (!title || !className || !exercises) {
+                alert('Veuillez remplir tous les champs');
+                return;
+            }
+
+            sessions.push({title, className, exercises, date: new Date().toLocaleDateString()});
+            
+            document.getElementById('session-title').value = '';
+            document.getElementById('session-class').value = '';
+            document.getElementById('session-exercises').value = '';
+            
+            displaySessions();
+        }
+
+        function displaySessions() {
+            let html = '<h3>Séances planifiées:</h3>';
+            sessions.forEach((s, index) => {
+                html += `<div class="exercise-card">
+                    <h4>${s.title} - ${s.className}</h4>
+                    <p><strong>Date:</strong> ${s.date}</p>
+                    <p>${s.exercises}</p>
+                </div>`;
+            });
+            document.getElementById('sessions-list').innerHTML = html;
+        }
+
+        // ÉVALUATION
+        function addEvaluation() {
+            const student = document.getElementById('eval-student').value.trim();
+            const skill = document.getElementById('eval-skill').value.trim();
+            const grade = document.getElementById('eval-grade').value;
+            const comment = document.getElementById('eval-comment').value.trim();
+
+            if (!student || !skill || !grade) {
+                alert('Veuillez remplir les champs obligatoires');
+                return;
+            }
+
+            evaluations.push({student, skill, grade, comment, date: new Date().toLocaleDateString()});
+            
+            document.getElementById('eval-student').value = '';
+            document.getElementById('eval-skill').value = '';
+            document.getElementById('eval-grade').value = '';
+            document.getElementById('eval-comment').value = '';
+            
+            displayEvaluations();
+        }
+
+        function displayEvaluations() {
+            let html = '<h3>Évaluations:</h3><table><tr><th>Élève</th><th>Compétence</th><th>Note</th><th>Commentaire</th><th>Date</th></tr>';
+            evaluations.forEach(e => {
+                html += `<tr><td>${e.student}</td><td>${e.skill}</td><td>${e.grade}/20</td><td>${e.comment}</td><td>${e.date}</td></tr>`;
+            });
+            html += '</table>';
+            document.getElementById('evaluations-list').innerHTML = html;
+        }
+
+        // BASKET
+        function toggleBasketFields() {
+            const type = document.getElementById('basket-obs-type').value;
+            if (type === 'equipe') {
+                document.getElementById('equipe-fields').style.display = 'block';
+                document.getElementById('joueur-fields').style.display = 'none';
+            } else {
+                document.getElementById('equipe-fields').style.display = 'none';
+                document.getElementById('joueur-fields').style.display = 'block';
+            }
+        }
+
+        function startBasketObservation() {
+            const type = document.getElementById('basket-obs-type').value;
+            const date = document.getElementById('basket-date').value;
+            const observer = document.getElementById('basket-observer').value.trim();
+
+            let displayName = '';
+
+            if (type === 'equipe') {
+                const teamName = document.getElementById('basket-team-name').value.trim();
+                const teamColor = document.getElementById('basket-team-color').value.trim();
+                if (!teamName || !teamColor) {
+                    alert('Veuillez remplir le nom et la couleur de l\'équipe');
+                    return;
+                }
+                displayName = teamName + ' (' + teamColor + ')';
+            } else {
+                const playerName = document.getElementById('basket-player-name').value.trim();
+                if (!playerName) {
+                    alert('Veuillez remplir le nom du joueur');
+                    return;
+                }
+                displayName = playerName;
+            }
+
+            if (!date || !observer) {
+                alert('Veuillez remplir la date et le nom de l\'observateur');
+                return;
+            }
+
+            document.getElementById('display-team').textContent = displayName;
+            document.getElementById('display-date').textContent = date;
+            document.getElementById('display-observer').textContent = observer;
+
+            document.getElementById('basket-page-1').style.display = 'none';
+            document.getElementById('basket-page-2').style.display = 'block';
+        }
+
+        function backToBasketConfig() {
+            document.getElementById('basket-page-1').style.display = 'block';
+            document.getElementById('basket-page-2').style.display = 'none';
+        }
+
+        function incrementStat(stat) {
+            if (stat === 'passes') basketStats.passes++;
+            else if (stat === 'points') basketStats.points++;
+            else if (stat === 'ballesPerdues') basketStats.ballesPerdues++;
+            else if (stat === 'shoots') basketStats.shoots++;
+            updateBasketDisplay();
+        }
+
+        function decrementStat(stat) {
+            if (stat === 'passes' && basketStats.passes > 0) basketStats.passes--;
+            else if (stat === 'points' && basketStats.points > 0) basketStats.points--;
+            else if (stat === 'ballesPerdues' && basketStats.ballesPerdues > 0) basketStats.ballesPerdues--;
+            else if (stat === 'shoots' && basketStats.shoots > 0) basketStats.shoots--;
+            updateBasketDisplay();
+        }
+
+        function addPoints(points) {
+            basketStats.points += points;
+            updateBasketDisplay();
+        }
+
+        function updateBasketDisplay() {
+            document.getElementById('passes-count').textContent = basketStats.passes;
+            document.getElementById('points-count').textContent = basketStats.points;
+            document.getElementById('balles-perdues-count').textContent = basketStats.ballesPerdues;
+            document.getElementById('shoots-count').textContent = basketStats.shoots;
+        }
+
+        function resetBasketStats() {
+            if (confirm('Voulez-vous vraiment réinitialiser toutes les statistiques ?')) {
+                basketStats = {
+                    passes: 0,
+                    points: 0,
+                    ballesPerdues: 0,
+                    shoots: 0
+                };
+                updateBasketDisplay();
+            }
+        }
+
+        function exportBasketStats() {
+            const name = document.getElementById('display-team').textContent;
+            const date = document.getElementById('display-date').textContent;
+            const observer = document.getElementById('display-observer').textContent;
+
+            let summary = `<div class="exercise-card">
+                <h3>📊 Résumé de l'observation</h3>
+                <p><strong>Observation:</strong> ${name}</p>
+                <p><strong>Date:</strong> ${date}</p>
+                <p><strong>Observateur:</strong> ${observer}</p>
+                <hr style="margin: 15px 0;">
+                <p><strong>Passes réussies:</strong> ${basketStats.passes}</p>
+                <p><strong>Points marqués:</strong> ${basketStats.points}</p>
+                <p><strong>Balles perdues:</strong> ${basketStats.ballesPerdues}</p>
+                <p><strong>Shoots en course:</strong> ${basketStats.shoots}</p>
+            </div>`;
+
+            document.getElementById('basket-summary').innerHTML = summary;
+            alert('Statistiques exportées ! Vous pouvez faire une capture d\'écran du résumé.');
+        }
+    </script>
+</body>
+</html>
